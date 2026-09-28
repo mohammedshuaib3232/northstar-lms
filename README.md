@@ -54,14 +54,17 @@ Do not commit `.env`, SSH keys, database passwords, or AWS credentials. The Terr
 app/                 Flask application, models, routes, templates, static assets
 infra/terraform/     AWS infrastructure as code
 docs/                Architecture and screenshots
-tests/               Automated application tests
+tests/               Pytest fixtures and application tests
 .github/workflows/   GitHub Actions CI and EC2 deployment workflow
-report/              Submission report source
+Northstar_LMS_Project_Report.pdf
+                     13-page assignment report
+Northstar_LMS_Source.zip
+                     Portable copy of the complete source package
 ```
 
 ## Verification
 
-Run `pytest -q` and `python -m compileall -q app run.py`. `docs/screenshots/` currently contains labeled static interface previews; replace them with live browser captures after starting the app. The report records the checks performed and the cloud actions that still require AWS credentials and a GitHub repository.
+Run `python -m pytest -q` and `python -m compileall -q app run.py`. GitHub Actions runs both checks on pushes and pull requests. `docs/screenshots/` currently contains labeled static interface previews; replace them with live browser captures after starting the app. Terraform deployment and AWS service checks require your AWS account and are not run by CI.
 
 ## License
 
