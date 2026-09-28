@@ -1,0 +1,33 @@
+name: Deploy to EC2
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "report/**"
+      - "docs/**"
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements.txt
+      - run: pytest -q
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /opt/northstar-lms
+            git pull --ff-only origin main
+            sudo docker build -t northstar-lms:latest .
+            sudo docker rm -f northstar-lms || true
+            AWS_REGION=$(grep '^AWS_REGION=' .env.production | cut -d= -f2)
+            sudo docker run --name northstar-lms --restart unless-stopped -d -p 80:8000 --env-file .env.production --log-driver=awslogs --log-opt awslogs-region=$AWS_REGION --log-opt awslogs-group=/northstar-lms/application --log-opt awslogs-stream=ec2-app northstar-lms:latest

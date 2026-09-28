@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Northstar learning platform">
+  <title>{% block title %}Northstar LMS{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="{{ url_for('main.index') }}"><span class="brand-mark">N</span> northstar<span class="brand-light">learn</span></a>
+    <nav aria-label="Main navigation"><a href="{{ url_for('main.index') }}">Explore</a>{% if current_user.is_authenticated %}<a href="{{ url_for('main.dashboard') }}">My learning</a>{% if current_user.is_admin %}<a href="{{ url_for('main.admin_dashboard') }}">Admin</a>{% endif %}<span class="nav-user">{{ current_user.display_name }}</span><form method="post" action="{{ url_for('auth.logout') }}" class="inline"><input type="hidden" name="csrf_token" value="<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">"><button class="link-button">Sign out</button></form>{% else %}<a href="{{ url_for('auth.login') }}">Sign in</a><a class="button button-small" href="{{ url_for('auth.register') }}">Join free</a>{% endif %}</nav>
+  </header>
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}" role="status">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer"><span>© 2026 Northstar Learning</span><span>Learn anywhere. Grow everywhere.</span></footer>
+</body>
+</html>

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.venv*/
+.deps/
+.env
+instance/
+work/pip-temp/
+work/local-test.db
+work/local-test.db-*
+work/tmp*
+infra/terraform/.terraform/
+infra/terraform/*.tfstate*
+infra/terraform/terraform.tfvars

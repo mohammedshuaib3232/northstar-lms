@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+dnf update -y
+dnf install -y docker git
+systemctl enable --now docker
+mkdir -p /opt/northstar-lms
+git clone '${app_repo_url}' /opt/northstar-lms
+chown -R ec2-user:ec2-user /opt/northstar-lms
+usermod -aG docker ec2-user
+cat > /opt/northstar-lms/.env.production <<'ENVVARS'
+SECRET_KEY=${secret_key}
+APP_ENV=production
+DATABASE_URL=${db_url}
+STORAGE_BACKEND=s3
+S3_BUCKET=${s3_bucket}
+AWS_REGION=${aws_region}
+SESSION_COOKIE_SECURE=false
+UPLOAD_FOLDER=/app/instance/uploads
+MAX_CONTENT_LENGTH=52428800
+ENVVARS
+cd /opt/northstar-lms
+docker build -t northstar-lms:latest .
+docker run --name northstar-lms --restart unless-stopped -d -p 80:8000 --env-file .env.production --log-driver=awslogs --log-opt awslogs-region='${aws_region}' --log-opt awslogs-group='${log_group}' --log-opt awslogs-stream=ec2-app northstar-lms:latest
+for attempt in $(seq 1 20); do
+  if docker exec -u 10001 northstar-lms flask --app run.py init-db; then break; fi
+  sleep 10
+done
+for attempt in $(seq 1 20); do
+  if docker exec -u 10001 northstar-lms flask --app run.py init-db; then break; fi
+  sleep 10
+done
