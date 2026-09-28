@@ -26,7 +26,7 @@ The Terraform configuration provisions a VPC, EC2 application host, RDS PostgreS
 
 ## GitHub CI and deployment
 
-The CI workflow runs compile checks and pytest on pushes and pull requests. To enable automated EC2 deployment, configure repository secrets `EC2_HOST` (instance DNS/IP), `EC2_USER` (`ec2-user`), and `EC2_SSH_KEY` (a deploy-only private key whose matching public key is installed for that user). The deploy workflow runs tests, then connects to the instance, pulls `main`, rebuilds the image, and restarts the container.
+The CI workflow runs compile checks and pytest on pushes and pull requests. The EC2 deploy workflow is manual and requires repository secrets `EC2_HOST` (instance DNS/IP), `EC2_USER` (`ec2-user`), and `EC2_SSH_KEY` (a deploy-only private key whose matching public key is installed for that user). After Terraform has provisioned the instance and these secrets are configured, start the deploy workflow from the GitHub Actions page. It runs tests, then connects to the instance, pulls `main`, rebuilds the image, and restarts the container.
 
 Terraform installs the supplied public key on EC2; store the matching private key only as the GitHub `EC2_SSH_KEY` secret. Restrict SSH ingress to a trusted static runner or use AWS Systems Manager Session Manager for production. GitHub-hosted runner IP ranges change, so a static trusted runner is preferred.
 

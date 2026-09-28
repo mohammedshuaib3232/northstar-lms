@@ -1,11 +1,6 @@
 name: Deploy to EC2
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "report/**"
-      - "docs/**"
 permissions:
   contents: read
 jobs:
@@ -17,7 +12,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
-      - run: pytest -q
+      - run: python -m pytest -q
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
